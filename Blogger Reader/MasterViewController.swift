@@ -17,6 +17,15 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        //let url = NSURL("")
+        
+        
+        
+        
+        
+        
+        
         // Do any additional setup after loading the view, typically from a nib.
         self.navigationItem.leftBarButtonItem = self.editButtonItem()
 
@@ -39,7 +48,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
     }
 
     func insertNewObject(sender: AnyObject) {
-        let context = self.fetchedResultsController.managedObjectContext
+        /*let context = self.fetchedResultsController.managedObjectContext
         let entity = self.fetchedResultsController.fetchRequest.entity!
         let newManagedObject = NSEntityDescription.insertNewObjectForEntityForName(entity.name!, inManagedObjectContext: context)
              
@@ -55,7 +64,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
             // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
             //print("Unresolved error \(error), \(error.userInfo)")
             abort()
-        }
+        }*/
     }
 
     // MARK: - Segues
@@ -112,7 +121,7 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
     }
 
     func configureCell(cell: UITableViewCell, withObject object: NSManagedObject) {
-        cell.textLabel!.text = object.valueForKey("timeStamp")!.description
+        cell.textLabel!.text = object.valueForKey("title")!.description
     }
 
     // MARK: - Fetched results controller
@@ -124,14 +133,14 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
         
         let fetchRequest = NSFetchRequest()
         // Edit the entity name as appropriate.
-        let entity = NSEntityDescription.entityForName("Event", inManagedObjectContext: self.managedObjectContext!)
+        let entity = NSEntityDescription.entityForName("BloggerItems", inManagedObjectContext: self.managedObjectContext!)
         fetchRequest.entity = entity
         
         // Set the batch size to a suitable number.
         fetchRequest.fetchBatchSize = 20
         
         // Edit the sort key as appropriate.
-        let sortDescriptor = NSSortDescriptor(key: "timeStamp", ascending: false)
+        let sortDescriptor = NSSortDescriptor(key: "title", ascending: false)
         
         fetchRequest.sortDescriptors = [sortDescriptor]
         
