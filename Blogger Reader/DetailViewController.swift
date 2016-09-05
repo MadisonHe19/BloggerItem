@@ -2,7 +2,7 @@
 //  DetailViewController.swift
 //  Blogger Reader
 //
-//  Created by Madison  on 9/2/16.
+//  Created by Madison 
 //  Copyright © 2016 Madison . All rights reserved.
 //
 

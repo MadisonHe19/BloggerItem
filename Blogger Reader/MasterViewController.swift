@@ -2,7 +2,7 @@
 //  MasterViewController.swift
 //  Blogger Reader
 //
-//  Created by Madison  on 9/2/16.
+//  Created by Madison  
 //  Copyright © 2016 Madison . All rights reserved.
 //
 
@@ -18,7 +18,58 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        //let url = NSURL("")
+        // create url object of json url
+        let url = NSURL(string: "https://www.googleapis.com/blogger/v3/blogs/10861780/posts?key=AIzaSyD5NXIuySRa97kY5zR2rDu-a0WuIeRtg_I")!
+        
+        //create object to grab data from ressource
+        let mySession = NSURLSession.sharedSession()
+        
+        //define the data task
+        let dataTask = mySession.dataTaskWithURL(url) { (data, response, error) in
+            
+            //check there is no error with the data session
+            if error != nil{
+                print(error)
+            }
+            else{
+            
+                //check that data variable references location that has some value
+                if let data = data{
+                    
+                    do{
+                     
+                    //serialization of json data into object and cast to NSDictionary
+                    let jsonData = try NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions.MutableContainers)as! NSDictionary
+                   
+                        // if the dictionary has something in it
+                        if jsonData.count > 0 {
+                        
+                            // get a reference to the value for the key items(which should be a dictionary)
+                            if let items = jsonData["items"] as? NSArray{
+                                
+                                if let title = items["title"] as? String {
+                                
+                                    if let content = items["content"] as? String                                 }
+                            }
+                            
+                        }
+                    
+                        
+                        
+                        
+                        
+                    } catch{
+                                print("Sorry")
+                    }
+                
+                    //print(NSString(data: data, encoding: NSUTF8StringEncoding))
+                }
+            }
+        }
+        
+        //begin data task
+        dataTask.resume()
+        
         
         
         
