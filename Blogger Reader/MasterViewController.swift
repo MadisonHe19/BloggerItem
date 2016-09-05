@@ -18,64 +18,108 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // create url object of json url
+        // get reference to our app's app delegate
+        let appDel: AppDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+        
+        // get a reference to the core data object space
+        let context : NSManagedObjectContext = appDel.managedObjectContext
+        
+        
+    
+        
+        // instance of url object for json resource
         let url = NSURL(string: "https://www.googleapis.com/blogger/v3/blogs/10861780/posts?key=AIzaSyD5NXIuySRa97kY5zR2rDu-a0WuIeRtg_I")!
         
-        //create object to grab data from ressource
-        let mySession = NSURLSession.sharedSession()
-        
-        //define the data task
-        let dataTask = mySession.dataTaskWithURL(url) { (data, response, error) in
+        //instance of object to handle data transfer
+        let dataSession = NSURLSession.sharedSession()
+    
+        //define task for data transfer of json and returns object of NSURLSessionDataTask
+        let task = dataSession.dataTaskWithURL(url) { (data, response, error) in
             
-            //check there is no error with the data session
             if error != nil{
-                print(error)
+                   print(error)
             }
             else{
-            
-                //check that data variable references location that has some value
+                
+                // while there is data get a reference to it
                 if let data = data{
                     
                     do{
-                     
-                    //serialization of json data into object and cast to NSDictionary
-                    let jsonData = try NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions.MutableContainers)as! NSDictionary
-                   
-                        // if the dictionary has something in it
-                        if jsonData.count > 0 {
                         
-                            // get a reference to the value for the key items(which should be a dictionary)
-                            if let items = jsonData["items"] as? NSArray{
-                                
-                                if let title = items["title"] as? String {
-                                
-                                    if let content = items["content"] as? String                                 }
-                            }
+                    // convert data into a foundation object and downcast it to a dictionary
+                    let json = try NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions.MutableContainers) as! NSDictionary
+                        
+                    //get a handle of the array of items in json data(which are dictionaries)
+                    if let items = json["items"] as? NSArray{
+                        
+                        // reference to object that represents a request to object space
+                        let request = NSFetchRequest(entityName: "BloggerItems")
+                        
+                        //allow access to all data of returned objects
+                        request.returnsObjectsAsFaults = false
+                        
+                        do {
+                        
+                            // returns array of objects requested by NSFetchRequest
+                            let results = try context.executeFetchRequest(request)
                             
-                        }
+                            if results.count > 0 {
+                            
+                                //clear core data so we aren't repeatedly saving
+                                for result in results{
+                                    
+                                    //delete each object in the stored object space
+                                    context.deleteObject(result as! NSManagedObject)
+                                    
+                                    //save what was done
+                                    do{try context.save()}catch{}
+                                
+                                }// end for loop
+                            
+                            }// end if
+                            
+                        }catch{
+                        
+                            print("error")
+                            
+                        }// end catch
+                        
+                        //loop through each dictionary and get title and content
+                        for item in items{
+                        
+                        if let title = item["title"] as? String{
+                        
+                            if let content = item["content"] as? String{
+                                
+                                
+                                let post : NSManagedObject = NSEntityDescription.insertNewObjectForEntityForName("BloggerItems", inManagedObjectContext: context)
+                                
+                                post.setValue(title, forKey: "title")
+                                post.setValue(content, forKey: "content")
+                                
+                                
+                            
+                                print(title)
+                                print(content)
+                            
+                            }// end if for content
+                        
+                          }//end if for title
+                        
+                        }// end for loop
+                      }// end if for items
+                        
+                    }// end do
+                    catch {
+                        
+                        print(error)
                     
-                        
-                        
-                        
-                        
-                    } catch{
-                                print("Sorry")
                     }
-                
                     //print(NSString(data: data, encoding: NSUTF8StringEncoding))
                 }
             }
         }
-        
-        //begin data task
-        dataTask.resume()
-        
-        
-        
-        
-        
-        
-        
+        task.resume()
         
         // Do any additional setup after loading the view, typically from a nib.
         self.navigationItem.leftBarButtonItem = self.editButtonItem()
